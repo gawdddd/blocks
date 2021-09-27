@@ -9,42 +9,49 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
-public class blockability extends CommandBase {
+public class checkblocks extends CommandBase {
 
     private Config conf = FileHandler.config;
 
     @Override
     public String getName() {
-        return "blockability";
+        return "checkblocks";
     }
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/blockability";
+        return TextFormatting.RED + "Usage: /" + this.getName();
     }
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (sender instanceof EntityPlayerMP) {
-            if (args.length == 1) {
-                if (args[0].equalsIgnoreCase("reload") && PermissionUtils.canUse("blocks.command.blockability.reload", sender)) {
-                    FileHandler.readAllFiles(); //doesnt actually read files need fix
-                }
-                if (args[0].equalsIgnoreCase("show") && PermissionUtils.canUse("blocks.command.blockability.show", sender)) {
-                    if (conf.showBlocks) {
-                        for (String block : conf.blocks) {
-                            this.send(sender, "&d" + block );
-                        }
-                    } else {
-                        this.send(sender, "&cBlocks not visable unlucko!");
+            if (PermissionUtils.canUse("blocks.command.checkblocks", sender)) {
+                if (conf.showBlocks) {
+                    this.send(sender, "&5Blocks in config: ");
+                    for (String block : conf.blocks) {
+                        this.send(sender, "&d" + block);
                     }
+
+                } else {
+                    this.send(sender, "&cBlocks not visable unlucko!");
                 }
-                else {
-                    this.send(sender, "&cYou do not have permission to use this command!");
-                }
+            } else {
+                this.send(sender, "&cYou're not allowed to use this command!");
             }
         }
+    }
+
+    @Override
+    public int getRequiredPermissionLevel() {
+        return 0;
+    }
+
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        return true;
     }
 
     private void send(ICommandSender recipient, String message) {
